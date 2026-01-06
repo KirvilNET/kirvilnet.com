@@ -5,7 +5,11 @@ on:
     inputs:
       version:
         description: "Version string to use"
-        required: false
+        required: true
+        type: string
+      frontend-artifact-id:
+        description: "Frontend build artifact id"
+        required: true
         type: string
     outputs:
       artifact-id:
@@ -36,7 +40,13 @@ jobs:
           lfs: true
 
       - name: Install Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1 # Optional, but can help with caching and specific versions
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Download Frontend
+        uses: actions/download-artifact@v5
+        with:
+          artifact-ids: ${{ inputs.frontend-artifact-id }}
+          path: /server/web
 
       - name: Build
         id: build-webserver

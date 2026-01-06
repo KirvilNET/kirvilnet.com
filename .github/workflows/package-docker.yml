@@ -16,10 +16,12 @@ jobs:
       version: ${{ inputs.version }}
 
   build-backend:
+    needs: [build-frontend]
     uses: ./.github/workflows/build-backend.yml
     name: Build Backend
     with:
       version: ${{ inputs.version }}
+      frontend-artifact-id: ${{ needs.build-frontend.outputs.artifact-id }}
 
   build-docker:
     needs: [build-frontend, build-backend]

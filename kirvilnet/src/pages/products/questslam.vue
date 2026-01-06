@@ -9,10 +9,6 @@
     {pageName: "faq", buttonName: "FAQ"},
   ]
 
-  function scrollToSection(section: string) {
-    document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
-  }
-
 </script>
 
 <template>
