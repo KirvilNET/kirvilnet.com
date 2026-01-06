@@ -1,0 +1,52 @@
+name: Build Web Server
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version string to use"
+        required: false
+        type: string
+    outputs:
+      artifact-id:
+        description: "The artifact ID for the built webserver"
+        value: ${{ jobs.build.outputs.artifact-id }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build Webserver
+    runs-on: ubuntu-latest
+
+    outputs:
+      artifact-id: ${{ steps.upload-webserver.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        id: checkout-repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          sparse-checkout: |
+            server
+            .github
+          sparse-checkout-cone-mode: false
+          lfs: true
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1 # Optional, but can help with caching and specific versions
+
+      - name: Build
+        id: build-webserver
+        working-directory: ./server
+        run: cargo build --release --verbose
+
+      - name: Upload artifact
+        id: upload-webserver
+        uses: actions/upload-artifact@v4
+        with:
+          name: kirvilnet-webserver-${{ inputs.version }}
+          path: server/target/release/kirvilnet-server
+          retention-days: 7

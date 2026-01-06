@@ -1,0 +1,12 @@
+[package]
+name = "kirvilnet-server"
+version = "1.0.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.8.7"
+tokio = { version = "1.39.3", features = ["full"] }
+tower-http = { version = "0.5.2", features = ["fs"] }
+rust-embed="8.9.0"
+mime = "0.3.17"
+mime_guess = "2.0.5"

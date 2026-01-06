@@ -1,0 +1,56 @@
+name: Build Vue App
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version string to use (optional, auto-generated if not provided)"
+        required: false
+        type: string
+    outputs:
+      artifact-id:
+        description: "The artifact ID for the built web UI"
+        value: ${{ jobs.build-vue-app.outputs.artifact-id }}
+
+jobs:
+  build-vue-app:
+    name: Build Vue App
+    runs-on: ubuntu-latest
+    
+    outputs:
+      artifact-id: ${{ steps.upload-vue-app.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        id: checkout-repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          sparse-checkout: |
+            server/web
+            kirvilnet
+            .github
+          sparse-checkout-cone-mode: false
+          lfs: true
+
+      - name: Setup Bun
+        id: setup-bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: ./kirvilnet
+        run: bun install
+
+      - name: Build Vue App
+        working-directory: ./kirvilnet
+        run: bun run build
+
+      - name: Upload artifact
+        id: upload-vue-app
+        uses: actions/upload-artifact@v4
+        with:
+          name: kirvilnet-vue-${{ inputs.version }}
+          path: server/web
+          retention-days: 7

@@ -1,0 +1,46 @@
+name: Build Docker Container
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version string to use"
+        type: string
+        required: true
+
+jobs:
+  build-frontend:
+    uses: ./.github/workflows/build-frontend.yml
+    name: Build Frontend
+    with:
+      version: ${{ inputs.version }}
+
+  build-backend:
+    uses: ./.github/workflows/build-backend.yml
+    name: Build Backend
+    with:
+      version: ${{ inputs.version }}
+
+  build-docker:
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu:latest
+
+    steps:
+      - name: Checkout repository
+        id: checkout-repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          sparse-checkout: |
+            docker
+            .github
+          sparse-checkout-cone-mode: false
+          lfs: true
+
+      - name: Download Server
+        uses: actions/download-artifact@v5
+        with:
+          artifact-ids: ${{ needs.build-backend.outputs.artifact-id }}
+          path: /docker/app
+      
+      
