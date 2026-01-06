@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           artifact-ids: ${{ inputs.frontend-artifact-id }}
-          path: /server/web
+          path: ./server/web
 
       - name: Build
         id: build-webserver
