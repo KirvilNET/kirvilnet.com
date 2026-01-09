@@ -52,9 +52,14 @@ jobs:
       #    username: ${{ secrets.REGISTRY_USERNAME }}
       #    password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Login to Docker Registry
+      - name: Debug Connectivity
         run: |
-          docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} registry.kirvilnet.com
+          echo "=== DNS Resolution ==="
+          nslookup registry.kirvilnet.com
+          echo "=== Curl Test ==="
+          curl -v https://registry.kirvilnet.com/v2/
+          echo "=== Docker Login Test ==="
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin registry.kirvilnet.com
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
