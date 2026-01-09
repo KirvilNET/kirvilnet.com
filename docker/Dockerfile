@@ -4,4 +4,8 @@ COPY ./app /app
 
 WORKDIR /app
 
-RUN ./kirvilnet-server
+RUN chmod +x ./kirvilnet-server
+
+EXPOSE 3000
+
+ENTRYPOINT ["./kirvilnet-server"]
